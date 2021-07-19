@@ -1,9 +1,7 @@
-package com.example.socialnetwork.model
+package com.example.socialnetwork.model.dataclass
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "user_table")
 data class User(
@@ -18,13 +16,11 @@ data class User(
     val email: String,
     val phone: String,
     val address: String,
-    @ColumnInfo(name = "about")
-    @SerializedName("about")
-    val aboutUser: String,
+    val about: String,
     val registered: String,
     val latitude: Float,
     val longitude: Float,
+    val friends: List<Friend>,
     // TODO: Enum class
-    val favoriteFruit: String,
-    val friends: ArrayList<Int>
+    val favoriteFruit: String
 )

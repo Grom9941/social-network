@@ -1,7 +1,6 @@
 package com.example.socialnetwork.model.network
 
-import com.example.socialnetwork.model.User
-import kotlinx.coroutines.flow.Flow
+import com.example.socialnetwork.model.dataclass.User
 import retrofit2.Response
 import retrofit2.http.GET
 

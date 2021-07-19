@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.socialnetwork.model.Converters
-import com.example.socialnetwork.model.User
+import com.example.socialnetwork.model.dataclass.User
 
 @Database(entities = [User::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
