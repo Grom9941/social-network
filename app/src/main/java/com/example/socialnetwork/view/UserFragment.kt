@@ -10,18 +10,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.socialnetwork.R
+import com.example.socialnetwork.UserApplication
 import com.example.socialnetwork.databinding.FragmentUserBinding
-import com.example.socialnetwork.model.Repository
-import com.example.socialnetwork.model.database.UserRoomDatabase
-import com.example.socialnetwork.model.dataclass.Friend
-import com.example.socialnetwork.model.dataclass.User
-import com.example.socialnetwork.model.network.RetrofitInstance
 import com.example.socialnetwork.viewmodel.TestViewModel
 import com.example.socialnetwork.viewmodel.ViewModelFactory
 
 class UserFragment : Fragment() {
 
     private lateinit var binding: FragmentUserBinding
+
+    private val testViewModel: TestViewModel by activityViewModels {
+        ViewModelFactory((activity?.application as UserApplication).repository)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,27 +30,37 @@ class UserFragment : Fragment() {
     ): View {
         binding =  FragmentUserBinding.inflate(inflater, container, false)
 
-
         val recyclerView: RecyclerView = binding.recycleView
+        val userAdapter = UserAdapter()
         recyclerView.apply {
+            adapter = userAdapter
             layoutManager = LinearLayoutManager(activity)
-            adapter = UserAdapter(listOf(User(1,true,1,"f","f","f","f","f","f","f","f",1.9f, 1.9f,
-                listOf(Friend(1)), "f")))
         }
 
-        //testViewModel.getUsersNetwork()
-        Log.v("UserFragment", "network request")
+        testViewModel.allUsersNetwork.observe(viewLifecycleOwner, { userNetwork ->
+            Log.v("SocialNetwork_UserFragment_networkRetrofitRequest", userNetwork.toString())
+            //userNetwork.let { userAdapter.submitList(it.body()) }
+            userNetwork.let { it.body()?.let { it1 -> testViewModel.insert(it1[0]) } }
+        })
 
-        //testViewModel.allUsersNetwork.observe(viewLifecycleOwner, {
-        //        userNetwork -> recyclerView.adapter = userNetwork.body()?.let { UserAdapter(it) }
-        //})
+        testViewModel.allUsersCache.observe(viewLifecycleOwner, { userCache ->
+            Log.v("SocialNetwork_UserFragment_cacheRoomRequest", userCache.toString())
+            userCache.let { userAdapter.submitList(it) }
+        })
 
+        testViewModel.getUsersNetwork()
         return binding.root
     }
-    /*
-        view.findViewById<Button>(R.id.button).setOnClickListener {
-            Navigation.findNavController(view)
-                .navigate(R.id.action_userFragment_to_userInfoFragment)
-        }
-         */
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val TAG = "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
+        Log.v("SocialNetwork_UserFragment_tagFragment", TAG)
+
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.replace(R.id.nav_host_fragment_container, UserInfoFragment(), TAG)
+            ?.addToBackStack(TAG)
+            ?.commit()
+    }
 }

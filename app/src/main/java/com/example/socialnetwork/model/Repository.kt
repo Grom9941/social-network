@@ -13,6 +13,7 @@ class Repository(private val userDao: UserDao, private val webservice: Webservic
     suspend fun getUsersNetwork() = webservice.getAllUsers()
 
     //fun getFriendsById(id: Int) = userDao.getFriendsById(id)
+
     fun getUserInfoById(id: Int) = userDao.getUserInfoById(id)
 
     @WorkerThread

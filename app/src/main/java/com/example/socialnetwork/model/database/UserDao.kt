@@ -1,7 +1,9 @@
 package com.example.socialnetwork.model.database
 
-import androidx.room.*
-import com.example.socialnetwork.model.dataclass.Friend
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.example.socialnetwork.model.dataclass.User
 import kotlinx.coroutines.flow.Flow
 

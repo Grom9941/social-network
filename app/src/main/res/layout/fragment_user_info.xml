@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Aisha Velasquez"
+            android:text="@string/name"
             android:textSize="40sp"
             app:layout_constraintBottom_toBottomOf="@+id/favorite_fruit"
             app:layout_constraintEnd_toEndOf="parent"
@@ -53,14 +53,14 @@
             android:id="@+id/age"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="35"
+            android:text="@string/age"
             android:textSize="25sp" />
 
         <TextView
             android:id="@+id/company"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BUGSALL"
+            android:text="@string/company"
             android:textSize="25sp" />
 
         <ImageView
@@ -70,23 +70,23 @@
             android:layerType="software"
             android:src="@drawable/dotted"
             app:layout_constraintTop_toBottomOf="@+id/flow"
-            android:contentDescription="@string/line_separator" />
+            android:contentDescription="@string/line1" />
 
         <TextView
             android:id="@+id/email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="aishavelasquez@bugsall.com"
+            android:text="@string/email"
             android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@+id/ic_mail"
-            app:layout_constraintStart_toEndOf="@+id/ic_mail"
+            app:layout_constraintBottom_toBottomOf="@+id/ic_email"
+            app:layout_constraintStart_toEndOf="@+id/ic_email"
             app:layout_constraintTop_toBottomOf="@+id/ic_phone" />
 
         <TextView
             android:id="@+id/phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+1 (906) 447-2711"
+            android:text="@string/phone"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="@+id/ic_phone"
             app:layout_constraintStart_toEndOf="@+id/ic_phone"
@@ -96,11 +96,11 @@
             android:id="@+id/address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="176 Tehama Street, Durham, Connecticut, 3324"
+            android:text="@string/address"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="@+id/ic_location"
             app:layout_constraintStart_toEndOf="@+id/ic_location"
-            app:layout_constraintTop_toBottomOf="@+id/ic_mail" />
+            app:layout_constraintTop_toBottomOf="@+id/ic_email" />
 
         <ImageView
             android:id="@+id/ic_phone"
@@ -108,15 +108,17 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_phone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/line1" />
+            app:layout_constraintTop_toBottomOf="@+id/line1"
+            android:contentDescription="@string/ic_phone" />
 
         <ImageView
-            android:id="@+id/ic_mail"
+            android:id="@+id/ic_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_mail"
+            android:src="@drawable/ic_email"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ic_phone" />
+            app:layout_constraintTop_toBottomOf="@+id/ic_phone"
+            android:contentDescription="@string/ic_email" />
 
         <ImageView
             android:id="@+id/ic_location"
@@ -124,7 +126,8 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_location"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ic_mail" />
+            app:layout_constraintTop_toBottomOf="@+id/ic_email"
+            android:contentDescription="@string/ic_location" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrier_address_mail_phone"
@@ -132,13 +135,13 @@
             android:layout_height="0dp"
             android:orientation="vertical"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="ic_location, ic_mail, ic_phone, address, email, phone" />
+            app:constraint_referenced_ids="ic_location, ic_email, ic_phone, address, email, phone" />
 
         <TextView
             android:id="@+id/about"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Eu Lorem commodo nisi exercitation dolore. Eiusmod officia mollit proident labore ea nostrud elit esse sit commodo. Magna sunt nostrud magna irure magna exercitation ipsum ullamco irure nostrud."
+            android:text="@string/about"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/barrier_address_mail_phone" />

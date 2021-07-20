@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">SocialNetwork</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment">hello blank fragment</string>
     <string name="favorite_fruit">favorite fruit</string>
-    <string name="line_separator">line_separator</string>
+    <string name="line1">line separator 1</string>
+    <string name="name">Aisha Velasquez</string>
+    <string name="age">35</string>
+    <string name="company">BUGSALL</string>
+    <string name="email">aishavelasquez@bugsall.com</string>
+    <string name="phone">+1 (906) 447–2711</string>
+    <string name="address">176 Tehama Street, Durham, Connecticut, 3324 (-10.309931,-19.473416)</string>
+    <string name="ic_phone">image phone</string>
+    <string name="ic_email">image email</string>
+    <string name="ic_location">image location</string>
+    <string name="about">Eu Lorem commodo nisi exercitation dolore. Eiusmod officia mollit proident labore ea nostrud elit esse sit commodo. Magna sunt nostrud magna irure magna exercitation ipsum ullamco irure nostrud.</string>
 </resources>
