@@ -7,9 +7,9 @@ import java.lang.IllegalArgumentException
 
 class ViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TestViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return TestViewModel(repository) as T
+            return UserViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class provided")
     }

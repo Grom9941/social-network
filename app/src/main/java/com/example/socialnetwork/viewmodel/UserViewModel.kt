@@ -9,7 +9,16 @@ import com.example.socialnetwork.model.dataclass.User
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-class TestViewModel(private val repository: Repository) : ViewModel() {
+class UserViewModel(private val repository: Repository) : ViewModel() {
+
+    private val sharedData: MutableLiveData<Int> = MutableLiveData()
+    private val userInfo: MutableLiveData<User> = MutableLiveData()
+
+    fun setData(id: Int) {
+        sharedData.value = id
+    }
+    fun getData() = sharedData
+
     val allUsersNetwork: MutableLiveData<Response<List<User>>> = MutableLiveData()
     fun getUsersNetwork() {
         viewModelScope.launch {
@@ -21,6 +30,11 @@ class TestViewModel(private val repository: Repository) : ViewModel() {
     //fun getFriends(id: Int) = repository.getFriendsById(id).asLiveData()
     fun getUserInfo(id: Int) = repository.getUserInfoById(id).asLiveData()
 
+
     fun insert(user: User) = viewModelScope.launch { repository.insert(user) }
+    fun insert(userList: List<User>) = viewModelScope.launch {
+        userList.forEach{repository.insert(it)}
+    }
+
     fun delete() = viewModelScope.launch { repository.delete() }
 }

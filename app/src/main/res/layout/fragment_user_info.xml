@@ -1,157 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.UserInfoFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycle_view_list_friends"
         android:layout_width="match_parent"
-        android:layout_height="0dp">
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/registered"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/favorite_fruit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/favorite_fruit"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+    <TextView
+        android:id="@+id/registered"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="@string/registered"
+        android:textColor="@color/cardview_dark_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/name"
-            android:textSize="40sp"
-            app:layout_constraintBottom_toBottomOf="@+id/favorite_fruit"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/favorite_fruit"
-            app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrier_image_name"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="favorite_fruit, name" />
-
-        <androidx.constraintlayout.helper.widget.Flow
-            android:id="@+id/flow"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="age, company"
-            app:layout_constraintEnd_toEndOf="@+id/name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/barrier_image_name" />
-
-        <TextView
-            android:id="@+id/age"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/age"
-            android:textSize="25sp" />
-
-        <TextView
-            android:id="@+id/company"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/company"
-            android:textSize="25sp" />
-
-        <ImageView
-            android:id="@+id/line1"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layerType="software"
-            android:src="@drawable/dotted"
-            app:layout_constraintTop_toBottomOf="@+id/flow"
-            android:contentDescription="@string/line1" />
-
-        <TextView
-            android:id="@+id/email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/email"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@+id/ic_email"
-            app:layout_constraintStart_toEndOf="@+id/ic_email"
-            app:layout_constraintTop_toBottomOf="@+id/ic_phone" />
-
-        <TextView
-            android:id="@+id/phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/phone"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@+id/ic_phone"
-            app:layout_constraintStart_toEndOf="@+id/ic_phone"
-            app:layout_constraintTop_toTopOf="@+id/ic_phone" />
-
-        <TextView
-            android:id="@+id/address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/address"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@+id/ic_location"
-            app:layout_constraintStart_toEndOf="@+id/ic_location"
-            app:layout_constraintTop_toBottomOf="@+id/ic_email" />
-
-        <ImageView
-            android:id="@+id/ic_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_phone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/line1"
-            android:contentDescription="@string/ic_phone" />
-
-        <ImageView
-            android:id="@+id/ic_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_email"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ic_phone"
-            android:contentDescription="@string/ic_email" />
-
-        <ImageView
-            android:id="@+id/ic_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_location"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ic_email"
-            android:contentDescription="@string/ic_location" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrier_address_mail_phone"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="ic_location, ic_email, ic_phone, address, email, phone" />
-
-        <TextView
-            android:id="@+id/about"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/about"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/barrier_address_mail_phone" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/about" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>

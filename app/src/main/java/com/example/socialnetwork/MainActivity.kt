@@ -7,14 +7,17 @@ import com.example.socialnetwork.view.UserFragment
 
 class MainActivity : AppCompatActivity() {
 
+    private val USER_FRAGMENT_TAG = "BACK_STACK_ROOT_TAG"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val TAG = "BACK_STACK_ROOT_TAG"
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.nav_host_fragment_container, UserFragment())
-            .addToBackStack(TAG)
-            .commit()
+        if (supportFragmentManager.backStackEntryCount == 0) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment_container, UserFragment())
+                .addToBackStack(USER_FRAGMENT_TAG)
+                .commit()
+        }
     }
 }
