@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.socialnetwork.model.dataclass.Friend
 import com.example.socialnetwork.model.dataclass.User
 import kotlinx.coroutines.flow.Flow
 
@@ -16,7 +15,7 @@ interface UserDao {
     @Query("SELECT * FROM user_table WHERE id=:id")
     fun getUserInfoById(id: Int): Flow<User>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: User)
 
     @Query("DELETE FROM user_table")

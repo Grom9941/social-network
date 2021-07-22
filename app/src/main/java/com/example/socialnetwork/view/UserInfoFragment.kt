@@ -46,36 +46,38 @@ class UserInfoFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-/*
-        userViewModel.getData().observe(viewLifecycleOwner, {
-            userViewModel.getUserInfo(it).observe(viewLifecycleOwner, { userInfo ->
-                userInfo?.let {
+
+        userViewModel.usersData.observe(viewLifecycleOwner, {
+            it?.let { userCache ->
+                userViewModel.getData().observe(viewLifecycleOwner, { usersListId ->
+
+                    var position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
+                    position = if (position > 0) position-1 else position
+                    val userInfo = userCache[usersListId[position]]
+
                     val odt = OffsetDateTime.parse(userInfo.registered.replace(" ", ""))
                     val registered = odt.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yy"))
                     binding.registered.text = registered
 
-                    userInfo.friends.forEach { friendId ->
-                        friendId.id
+                    val listOfFriends = mutableListOf(userInfo)
+                    userInfo.friends.forEach { friend ->
+                        Log.v("userFriends", friend.id.toString())
+                        listOfFriends.add(userCache[friend.id])
                     }
-                }
 
-            })
-        })
-*/
-        userViewModel.usersData.observe(viewLifecycleOwner, { userCache ->
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "cacheRoomRequest", userCache.toString())
-            //TODO: change function invocation
-            userCache[0].let {
-                it.friends.forEach { it1 ->
-                    Log.v("userCache", it1.id.toString())
-                }
+                    Log.v(
+                        USER_INFO_FRAGMENT_LOG_MESSAGE + "cacheRoomRequest",
+                        listOfFriends.toString()
+                    )
+                    userInfoAdapter.submitList(listOfFriends)
+                })
             }
-            userCache.let { userInfoAdapter.submitList(listOf(it[0], it[0])) }
         })
     }
 
     private fun createRecyclerView() {
         val recyclerView: RecyclerView = binding.recycleViewListFriends
+
         userInfoAdapter = UserInfoAdapter()
         userInfoAdapter.onClickListener.observe(viewLifecycleOwner, {
             Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
@@ -86,13 +88,15 @@ class UserInfoFragment : Fragment() {
             Log.v("clickList", dataStr)
 
             when (dataInt) {
-                USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
+                USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT)
+                    .show()
                 DIAL_PHONE -> dialPhone(dataStr)
                 COMPOSE_EMAIL -> composeEmail(arrayOf(dataStr))
                 SHOW_LOCATION -> showLocation(dataStr)
                 else -> {
                     Log.v("clickList", "pressed")
-                    userViewModel.setData(dataInt)
+                    val position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
+                    userViewModel.setData(dataInt, position)
                     transactionToInfo()
                 }
             }

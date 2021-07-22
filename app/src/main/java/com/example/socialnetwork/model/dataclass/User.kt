@@ -9,7 +9,6 @@ data class User(
     val id: Int,
     val isActive: Boolean,
     val age: Byte,
-    // TODO: Enum class
     val eyeColor: String,
     val name: String,
     val company: String,
@@ -21,6 +20,5 @@ data class User(
     val latitude: Float,
     val longitude: Float,
     val friends: List<Friend>,
-    // TODO: Enum class
     val favoriteFruit: String
 )

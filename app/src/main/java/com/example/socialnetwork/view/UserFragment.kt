@@ -36,10 +36,9 @@ class UserFragment : Fragment() {
 
         userViewModel.usersData.observe(viewLifecycleOwner, { userData ->
             userData?.let {
-                Log.v(Companion.USER_INFO_FRAGMENT_LOG_MESSAGE + "request", userData.toString())
-                userData.let { userAdapter.submitList(it) }
+                //Log.v(Companion.USER_INFO_FRAGMENT_LOG_MESSAGE + "request", userData.toString())
+                userAdapter.submitList(it)
             }
-            //userData.let { it?.let { it1 -> userViewModel.insert(it1) } }
         })
 
         userViewModel.getUsersData()
@@ -50,7 +49,7 @@ class UserFragment : Fragment() {
         val recyclerView: RecyclerView = binding.recycleView
         userAdapter = UserAdapter()
         userAdapter.onClickListener.observe(viewLifecycleOwner, {
-            Log.v(Companion.USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
+            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
             when (it) {
                 USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
                 else -> {
@@ -69,7 +68,7 @@ class UserFragment : Fragment() {
     private fun transactionToInfo() {
         val USER_INFO_FRAGMENT_TAG =
             "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
-        Log.v(Companion.USER_INFO_FRAGMENT_LOG_MESSAGE + "tagFragment", USER_INFO_FRAGMENT_TAG)
+        Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "tagFragment", USER_INFO_FRAGMENT_TAG)
 
         activity?.supportFragmentManager
             ?.beginTransaction()

@@ -1,10 +1,9 @@
 package com.example.socialnetwork
 
 import android.app.Application
-import androidx.fragment.app.FragmentActivity
 import com.example.socialnetwork.model.Repository
-import com.example.socialnetwork.model.network.RetrofitInstance
 import com.example.socialnetwork.model.database.UserRoomDatabase
+import com.example.socialnetwork.model.network.RetrofitInstance
 
 class UserApplication : Application() {
     private val database by lazy { UserRoomDatabase.getDatabase(this) }
