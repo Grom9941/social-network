@@ -51,7 +51,8 @@ class UserFragment : Fragment() {
         userAdapter.onClickListener.observe(viewLifecycleOwner, {
             Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
             when (it) {
-                USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
+                USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT)
+                    .show()
                 else -> {
                     userViewModel.setData(it)
                     transactionToInfo()

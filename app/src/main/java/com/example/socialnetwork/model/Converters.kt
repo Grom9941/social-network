@@ -11,7 +11,7 @@ class Converters {
 
     @TypeConverter
     fun fromJsonToListFriend(value: String?): List<Friend>? {
-        val turnsType = object: TypeToken<List<Friend>>() {}.type
+        val turnsType = object : TypeToken<List<Friend>>() {}.type
         return Gson().fromJson<List<Friend>>(value, turnsType)
     }
 }

@@ -15,8 +15,12 @@ class Repository(private val userDao: UserDao, private val webservice: Webservic
     fun getUserInfoById(id: Int) = userDao.getUserInfoById(id)
 
     @WorkerThread
-    suspend fun insert(user: User) { userDao.insert(user) }
+    suspend fun insert(user: User) {
+        userDao.insert(user)
+    }
 
     @WorkerThread
-    suspend fun delete() { userDao.deleteAll() }
+    suspend fun delete() {
+        userDao.deleteAll()
+    }
 }

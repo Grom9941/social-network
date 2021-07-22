@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 object RetrofitInstance {
-    private const val BASE_DIR = "https://firebasestorage.googleapis.com/v0/b/candidates--questionnaire.appspot.com/o/"
+    private const val BASE_DIR =
+        "https://firebasestorage.googleapis.com/v0/b/candidates--questionnaire.appspot.com/o/"
 
     private val client by lazy {
         OkHttpClient.Builder()

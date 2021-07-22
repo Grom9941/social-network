@@ -52,7 +52,7 @@ class UserInfoFragment : Fragment() {
                 userViewModel.getData().observe(viewLifecycleOwner, { usersListId ->
 
                     var position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
-                    position = if (position > 0) position-1 else position
+                    position = if (position > 0) position - 1 else position
                     val userInfo = userCache[usersListId[position]]
 
                     val odt = OffsetDateTime.parse(userInfo.registered.replace(" ", ""))
