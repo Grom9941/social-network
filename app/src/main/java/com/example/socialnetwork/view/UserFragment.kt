@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.socialnetwork.R
 import com.example.socialnetwork.UserApplication
 import com.example.socialnetwork.databinding.FragmentUserBinding
+import com.example.socialnetwork.view.UserInfoFragment.Companion.USER_OFFLINE
 import com.example.socialnetwork.viewmodel.UserViewModel
 import com.example.socialnetwork.viewmodel.ViewModelFactory
 
 class UserFragment : Fragment() {
 
-    private val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
     private lateinit var binding: FragmentUserBinding
     private lateinit var userAdapter: UserAdapter
 
@@ -31,21 +31,18 @@ class UserFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding =  FragmentUserBinding.inflate(inflater, container, false)
+        binding = FragmentUserBinding.inflate(inflater, container, false)
         createRecyclerView()
 
-        userViewModel.allUsersNetwork.observe(viewLifecycleOwner, { userNetwork ->
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"networkRetrofitRequest", userNetwork.toString())
-            userNetwork.let { userAdapter.submitList(it.body()) }
-            userNetwork.let { it.body()?.let { it1 -> userViewModel.insert(it1) } }
+        userViewModel.usersData.observe(viewLifecycleOwner, { userData ->
+            userData?.let {
+                Log.v(Companion.USER_INFO_FRAGMENT_LOG_MESSAGE + "request", userData.toString())
+                userData.let { userAdapter.submitList(it) }
+            }
+            //userData.let { it?.let { it1 -> userViewModel.insert(it1) } }
         })
 
-        userViewModel.allUsersCache.observe(viewLifecycleOwner, { userCache ->
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"cacheRoomRequest", userCache.toString())
-            userCache.let { userAdapter.submitList(it) }
-        })
-
-        userViewModel.getUsersNetwork()
+        userViewModel.getUsersData()
         return binding.root
     }
 
@@ -53,12 +50,13 @@ class UserFragment : Fragment() {
         val recyclerView: RecyclerView = binding.recycleView
         userAdapter = UserAdapter()
         userAdapter.onClickListener.observe(viewLifecycleOwner, {
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"onClickListener", it.toString())
-            if (it != -1) {
-                userViewModel.setData(it)
-                transactionToInfo()
-            } else {
-                Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
+            Log.v(Companion.USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
+            when (it) {
+                USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
+                else -> {
+                    userViewModel.setData(it)
+                    transactionToInfo()
+                }
             }
         })
 
@@ -69,13 +67,18 @@ class UserFragment : Fragment() {
     }
 
     private fun transactionToInfo() {
-        val USER_INFO_FRAGMENT_TAG = "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
-        Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"tagFragment", USER_INFO_FRAGMENT_TAG)
+        val USER_INFO_FRAGMENT_TAG =
+            "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
+        Log.v(Companion.USER_INFO_FRAGMENT_LOG_MESSAGE + "tagFragment", USER_INFO_FRAGMENT_TAG)
 
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.replace(R.id.nav_host_fragment_container, UserInfoFragment(), USER_INFO_FRAGMENT_TAG)
             ?.addToBackStack(USER_INFO_FRAGMENT_TAG)
             ?.commit()
+    }
+
+    companion object {
+        private const val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
     }
 }

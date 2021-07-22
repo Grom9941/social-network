@@ -15,7 +15,7 @@ import com.example.socialnetwork.model.dataclass.User
 import com.example.socialnetwork.view.UserInfoFragment.Companion.COMPOSE_EMAIL
 import com.example.socialnetwork.view.UserInfoFragment.Companion.DIAL_PHONE
 import com.example.socialnetwork.view.UserInfoFragment.Companion.SHOW_LOCATION
-import com.example.socialnetwork.view.UserInfoFragment.Companion.USER_OFFINE
+import com.example.socialnetwork.view.UserInfoFragment.Companion.USER_OFFLINE
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
@@ -39,7 +39,7 @@ class UserInfoAdapter(val onClickListener: MutableLiveData<Map<Int, String>> = M
                 holder.itemView.setOnClickListener {
                     Log.v("clickListAdapter", itemPos.isActive.toString())
                     onClickListener.value = if (itemPos.isActive) mapOf(getItem(position).id to "")
-                        else mapOf(USER_OFFINE to "")
+                    else mapOf(USER_OFFLINE to "")
                 }
                 holder.bind(itemPos.name, itemPos.email)
             }
@@ -81,9 +81,15 @@ class UserInfoAdapter(val onClickListener: MutableLiveData<Map<Int, String>> = M
                 else -> binding.favoriteFruit.setImageResource(R.drawable.ic_strawberry)
             }
 
-            binding.phone.setOnClickListener { onClickListener.value = mapOf(DIAL_PHONE to phoneNumber) }
-            binding.email.setOnClickListener { onClickListener.value = mapOf(COMPOSE_EMAIL to email) }
-            binding.address.setOnClickListener { onClickListener.value = mapOf(SHOW_LOCATION to latitudeLongitude) }
+            binding.phone.setOnClickListener {
+                onClickListener.value = mapOf(DIAL_PHONE to phoneNumber)
+            }
+            binding.email.setOnClickListener {
+                onClickListener.value = mapOf(COMPOSE_EMAIL to email)
+            }
+            binding.address.setOnClickListener {
+                onClickListener.value = mapOf(SHOW_LOCATION to latitudeLongitude)
+            }
         }
 
         companion object {

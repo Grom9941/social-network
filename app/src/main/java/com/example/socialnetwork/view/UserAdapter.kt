@@ -17,7 +17,7 @@ class UserAdapter(val onClickListener: MutableLiveData<Int> = MutableLiveData())
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.user_item, parent, false)
-        view.setOnClickListener {  }
+        view.setOnClickListener { }
         return ViewHolder(view)
     }
 

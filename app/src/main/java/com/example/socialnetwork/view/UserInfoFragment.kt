@@ -25,14 +25,6 @@ import java.time.format.DateTimeFormatter
 
 class UserInfoFragment : Fragment() {
 
-    companion object {
-        private const val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
-        const val USER_OFFINE = -1
-        const val DIAL_PHONE = -2
-        const val COMPOSE_EMAIL = -3
-        const val SHOW_LOCATION = -4
-    }
-
     private lateinit var binding: FragmentUserInfoBinding
     private lateinit var userInfoAdapter: UserInfoAdapter
 
@@ -54,7 +46,7 @@ class UserInfoFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+/*
         userViewModel.getData().observe(viewLifecycleOwner, {
             userViewModel.getUserInfo(it).observe(viewLifecycleOwner, { userInfo ->
                 userInfo?.let {
@@ -69,9 +61,9 @@ class UserInfoFragment : Fragment() {
 
             })
         })
-
-        userViewModel.allUsersCache.observe(viewLifecycleOwner, { userCache ->
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"cacheRoomRequest", userCache.toString())
+*/
+        userViewModel.usersData.observe(viewLifecycleOwner, { userCache ->
+            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "cacheRoomRequest", userCache.toString())
             //TODO: change function invocation
             userCache[0].let {
                 it.friends.forEach { it1 ->
@@ -86,14 +78,15 @@ class UserInfoFragment : Fragment() {
         val recyclerView: RecyclerView = binding.recycleViewListFriends
         userInfoAdapter = UserInfoAdapter()
         userInfoAdapter.onClickListener.observe(viewLifecycleOwner, {
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"onClickListener", it.toString())
+            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
 
             val dataInt = it.keys.elementAt(0)
             val dataStr = it.values.elementAt(0)
             Log.v("clickList", dataInt.toString())
             Log.v("clickList", dataStr)
+
             when (dataInt) {
-                USER_OFFINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
+                USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
                 DIAL_PHONE -> dialPhone(dataStr)
                 COMPOSE_EMAIL -> composeEmail(arrayOf(dataStr))
                 SHOW_LOCATION -> showLocation(dataStr)
@@ -103,8 +96,6 @@ class UserInfoFragment : Fragment() {
                     transactionToInfo()
                 }
             }
-
-            userViewModel.setData(dataInt)
         })
 
         recyclerView.apply {
@@ -114,8 +105,9 @@ class UserInfoFragment : Fragment() {
     }
 
     private fun transactionToInfo() {
-        val USER_INFO_FRAGMENT_TAG = "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
-        Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"tagFragment", USER_INFO_FRAGMENT_TAG)
+        val USER_INFO_FRAGMENT_TAG =
+            "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
+        Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "tagFragment", USER_INFO_FRAGMENT_TAG)
 
         activity?.supportFragmentManager
             ?.beginTransaction()
@@ -155,5 +147,11 @@ class UserInfoFragment : Fragment() {
         }
     }
 
-
+    companion object {
+        private const val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
+        const val USER_OFFLINE = -1
+        const val DIAL_PHONE = -2
+        const val COMPOSE_EMAIL = -3
+        const val SHOW_LOCATION = -4
+    }
 }
