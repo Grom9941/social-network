@@ -1,20 +1,27 @@
 package com.example.socialnetwork.view
 
+import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.socialnetwork.R
+import com.example.socialnetwork.databinding.HeaderBinding
+import com.example.socialnetwork.databinding.UserItemBinding
 import com.example.socialnetwork.model.dataclass.User
+import com.example.socialnetwork.view.UserInfoFragment.Companion.COMPOSE_EMAIL
+import com.example.socialnetwork.view.UserInfoFragment.Companion.DIAL_PHONE
+import com.example.socialnetwork.view.UserInfoFragment.Companion.SHOW_LOCATION
+import com.example.socialnetwork.view.UserInfoFragment.Companion.USER_OFFINE
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_ITEM = 1
 
-class UserInfoAdapter(val onClickListener: MutableLiveData<Int> = MutableLiveData()) :
+
+class UserInfoAdapter(val onClickListener: MutableLiveData<Map<Int, String>> = MutableLiveData()) :
     ListAdapter<User, RecyclerView.ViewHolder>(UserComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -30,43 +37,74 @@ class UserInfoAdapter(val onClickListener: MutableLiveData<Int> = MutableLiveDat
             is ViewHolder -> {
                 val itemPos = getItem(position)
                 holder.itemView.setOnClickListener {
-                    onClickListener.value = if (itemPos.isActive) getItem(position).id else -1
+                    Log.v("clickListAdapter", itemPos.isActive.toString())
+                    onClickListener.value = if (itemPos.isActive) mapOf(getItem(position).id to "")
+                        else mapOf(USER_OFFINE to "")
                 }
                 holder.bind(itemPos.name, itemPos.email)
+            }
+            is HeaderViewHolder -> {
+                holder.bind(getItem(position), onClickListener)
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
-            is User ->  ITEM_VIEW_TYPE_ITEM
-            else -> ITEM_VIEW_TYPE_HEADER
+        return when (position) {
+            0 -> ITEM_VIEW_TYPE_HEADER
+            else -> ITEM_VIEW_TYPE_ITEM
         }
     }
 
-    class HeaderViewHolder(view: View): RecyclerView.ViewHolder(view){
+    class HeaderViewHolder(private val binding: HeaderBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        @SuppressLint("SetTextI18n")
+        fun bind(userInfo: User, onClickListener: MutableLiveData<Map<Int, String>>) {
+            binding.name.text = userInfo.name
+            binding.age.text = userInfo.age.toString()
+            binding.company.text = userInfo.company
+
+            val phoneNumber = userInfo.phone
+            binding.phone.text = phoneNumber
+
+            val email = userInfo.email
+            binding.email.text = email
+
+            val latitudeLongitude = "${userInfo.latitude},${userInfo.longitude}"
+            binding.address.text = "${userInfo.address} ($latitudeLongitude)"
+
+            binding.about.text = userInfo.about
+            when (userInfo.favoriteFruit) {
+                "apple" -> binding.favoriteFruit.setImageResource(R.drawable.ic_apple)
+                "banana" -> binding.favoriteFruit.setImageResource(R.drawable.ic_banana)
+                else -> binding.favoriteFruit.setImageResource(R.drawable.ic_strawberry)
+            }
+
+            binding.phone.setOnClickListener { onClickListener.value = mapOf(DIAL_PHONE to phoneNumber) }
+            binding.email.setOnClickListener { onClickListener.value = mapOf(COMPOSE_EMAIL to email) }
+            binding.address.setOnClickListener { onClickListener.value = mapOf(SHOW_LOCATION to latitudeLongitude) }
+        }
+
         companion object {
             fun create(parent: ViewGroup): HeaderViewHolder {
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.header, parent, false)
+                val view = HeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return HeaderViewHolder(view)
             }
         }
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val name: TextView = view.findViewById(R.id.user_item_name)
-        private val email: TextView = view.findViewById(R.id.user_item_email)
+    class ViewHolder(private val binding: UserItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(nameText: String?, emailText: String?) {
-            name.text = nameText
-            email.text = emailText
+            binding.userItemName.text = nameText
+            binding.userItemEmail.text = emailText
         }
 
         companion object {
-            fun create(parent: ViewGroup): ViewHolder{
-                val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.user_item, parent, false)
+            fun create(parent: ViewGroup): ViewHolder {
+                val view =
+                    UserItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 return ViewHolder(view)
             }
         }

@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,9 +25,16 @@ import java.time.format.DateTimeFormatter
 
 class UserInfoFragment : Fragment() {
 
-    private val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
+    companion object {
+        private const val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
+        const val USER_OFFINE = -1
+        const val DIAL_PHONE = -2
+        const val COMPOSE_EMAIL = -3
+        const val SHOW_LOCATION = -4
+    }
+
     private lateinit var binding: FragmentUserInfoBinding
-    private lateinit var userInfoAdapter: UserAdapter
+    private lateinit var userInfoAdapter: UserInfoAdapter
 
     private val userViewModel: UserViewModel by activityViewModels {
         ViewModelFactory((activity?.application as UserApplication).repository)
@@ -50,21 +58,6 @@ class UserInfoFragment : Fragment() {
         userViewModel.getData().observe(viewLifecycleOwner, {
             userViewModel.getUserInfo(it).observe(viewLifecycleOwner, { userInfo ->
                 userInfo?.let {
-                    /*
-                  binding.name.text = userInfo.name
-                  binding.age.text = userInfo.age.toString()
-                  binding.company.text = userInfo.company
-                  binding.phone.text = userInfo.phone
-                  binding.email.text = userInfo.email
-                  binding.address.text = "${userInfo.address} (${userInfo.latitude},${userInfo.longitude})"
-                  binding.about.text = userInfo.about
-
-                  when (userInfo.favoriteFruit) {
-                      "apple" -> binding.favoriteFruit.setImageResource(R.drawable.ic_apple)
-                      "banana" -> binding.favoriteFruit.setImageResource(R.drawable.ic_banana)
-                      else -> binding.favoriteFruit.setImageResource(R.drawable.ic_strawberry)
-                  }
-                  */
                     val odt = OffsetDateTime.parse(userInfo.registered.replace(" ", ""))
                     val registered = odt.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yy"))
                     binding.registered.text = registered
@@ -80,28 +73,38 @@ class UserInfoFragment : Fragment() {
         userViewModel.allUsersCache.observe(viewLifecycleOwner, { userCache ->
             Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"cacheRoomRequest", userCache.toString())
             //TODO: change function invocation
-            userCache.let { userInfoAdapter.submitList(it) }
+            userCache[0].let {
+                it.friends.forEach { it1 ->
+                    Log.v("userCache", it1.id.toString())
+                }
+            }
+            userCache.let { userInfoAdapter.submitList(listOf(it[0], it[0])) }
         })
-
-        /*
-        val phoneNumber = binding.phone.text.toString()
-        val addresses = arrayOf(binding.email.text.toString())
-        val location = binding.address.text.split('(')
-        val latitudeLongitude = location[location.size - 1].dropLast(1)
-
-        binding.phone.setOnClickListener { dialPhone(phoneNumber) }
-        binding.email.setOnClickListener { composeEmail(addresses) }
-        binding.address.setOnClickListener { showLocation(latitudeLongitude) }
-         */
     }
 
     private fun createRecyclerView() {
         val recyclerView: RecyclerView = binding.recycleViewListFriends
-        userInfoAdapter = UserAdapter()
+        userInfoAdapter = UserInfoAdapter()
         userInfoAdapter.onClickListener.observe(viewLifecycleOwner, {
             Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE+"onClickListener", it.toString())
-            userViewModel.setData(it)
-            transactionToInfo()
+
+            val dataInt = it.keys.elementAt(0)
+            val dataStr = it.values.elementAt(0)
+            Log.v("clickList", dataInt.toString())
+            Log.v("clickList", dataStr)
+            when (dataInt) {
+                USER_OFFINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT).show()
+                DIAL_PHONE -> dialPhone(dataStr)
+                COMPOSE_EMAIL -> composeEmail(arrayOf(dataStr))
+                SHOW_LOCATION -> showLocation(dataStr)
+                else -> {
+                    Log.v("clickList", "pressed")
+                    userViewModel.setData(dataInt)
+                    transactionToInfo()
+                }
+            }
+
+            userViewModel.setData(dataInt)
         })
 
         recyclerView.apply {
