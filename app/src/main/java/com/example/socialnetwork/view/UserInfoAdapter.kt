@@ -41,7 +41,7 @@ class UserInfoAdapter(val onClickListener: MutableLiveData<Map<Int, String>> = M
                     onClickListener.value = if (itemPos.isActive) mapOf(getItem(position).id to "")
                     else mapOf(USER_OFFLINE to "")
                 }
-                holder.bind(itemPos.name, itemPos.email)
+                holder.bind(itemPos)
             }
             is HeaderViewHolder -> {
                 holder.bind(getItem(position), onClickListener)
@@ -102,9 +102,13 @@ class UserInfoAdapter(val onClickListener: MutableLiveData<Map<Int, String>> = M
 
     class ViewHolder(private val binding: UserItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(nameText: String?, emailText: String?) {
-            binding.userItemName.text = nameText
-            binding.userItemEmail.text = emailText
+        fun bind(itemPos: User) {
+            binding.userItemName.text = itemPos.name
+            binding.userItemEmail.text = itemPos.email
+            when (itemPos.isActive) {
+                true -> binding.isActive.setImageResource(R.drawable.circle_active)
+                false -> binding.isActive.setImageResource(R.drawable.circle_non_active)
+            }
         }
 
         companion object {

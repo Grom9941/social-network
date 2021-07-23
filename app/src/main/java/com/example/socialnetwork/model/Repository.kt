@@ -1,9 +1,9 @@
 package com.example.socialnetwork.model
 
 import androidx.annotation.WorkerThread
+import com.example.socialnetwork.model.database.UserDao
 import com.example.socialnetwork.model.dataclass.User
 import com.example.socialnetwork.model.network.Webservice
-import com.example.socialnetwork.model.database.UserDao
 
 class Repository(private val userDao: UserDao, private val webservice: Webservice) {
 

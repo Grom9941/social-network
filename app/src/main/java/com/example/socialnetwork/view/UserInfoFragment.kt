@@ -38,6 +38,7 @@ class UserInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentUserInfoBinding.inflate(inflater, container, false)
+        binding.progressBar.visibility = View.VISIBLE
         createRecyclerView()
         return binding.root
     }
@@ -59,6 +60,12 @@ class UserInfoFragment : Fragment() {
                     val registered = odt.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yy"))
                     binding.registered.text = registered
 
+                    when (userInfo.eyeColor) {
+                        "blue" -> binding.eyeColor.setImageResource(R.drawable.eye_blue)
+                        "brown" -> binding.eyeColor.setImageResource(R.drawable.eye_brown)
+                        "green" -> binding.eyeColor.setImageResource(R.drawable.eye_green)
+                    }
+
                     val listOfFriends = mutableListOf(userInfo)
                     userInfo.friends.forEach { friend ->
                         Log.v("userFriends", friend.id.toString())
@@ -69,6 +76,8 @@ class UserInfoFragment : Fragment() {
                         USER_INFO_FRAGMENT_LOG_MESSAGE + "cacheRoomRequest",
                         listOfFriends.toString()
                     )
+
+                    binding.progressBar.visibility = View.GONE
                     userInfoAdapter.submitList(listOfFriends)
                 })
             }
