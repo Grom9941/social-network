@@ -1,26 +1,14 @@
 package com.example.socialnetwork.model
 
-import androidx.annotation.WorkerThread
 import com.example.socialnetwork.model.database.UserDao
-import com.example.socialnetwork.model.dataclass.User
-import com.example.socialnetwork.model.network.Webservice
+import com.example.socialnetwork.model.network.UserRetrofitSource
+import javax.inject.Inject
 
-class Repository(private val userDao: UserDao, private val webservice: Webservice) {
+class Repository @Inject constructor(private val userDao: UserDao, private val userRetrofitSource: UserRetrofitSource) {
 
-    val allUsersCache = userDao.getAllUsers()
-
-    @WorkerThread
-    suspend fun getUsersNetwork() = webservice.getAllUsers()
-
-    fun getUserInfoById(id: Int) = userDao.getUserInfoById(id)
-
-    @WorkerThread
-    suspend fun insert(user: User) {
-        userDao.insert(user)
-    }
-
-    @WorkerThread
-    suspend fun delete() {
-        userDao.deleteAll()
-    }
+    fun getAllUsers() =  getUsersData(
+        databaseQuery = { userDao.getAllUsers() },
+        networkCall = { userRetrofitSource.getAllUsers() },
+        saveCallResult = { userDao.insertAll(it) }
+        )
 }

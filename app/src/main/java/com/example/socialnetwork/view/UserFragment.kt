@@ -1,9 +1,5 @@
 package com.example.socialnetwork.view
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,22 +13,19 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.socialnetwork.R
-import com.example.socialnetwork.UserApplication
-import com.example.socialnetwork.UserApplication.Variables.isNetworkConnected
 import com.example.socialnetwork.databinding.FragmentUserBinding
+import com.example.socialnetwork.model.Resource
 import com.example.socialnetwork.view.UserInfoFragment.Companion.USER_OFFLINE
 import com.example.socialnetwork.viewmodel.UserViewModel
-import com.example.socialnetwork.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class UserFragment : Fragment() {
 
     private lateinit var binding: FragmentUserBinding
     private lateinit var userAdapter: UserAdapter
-    private var dataLoaded = false
 
-    private val userViewModel: UserViewModel by activityViewModels {
-        ViewModelFactory((activity?.application as UserApplication).repository)
-    }
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,28 +37,33 @@ class UserFragment : Fragment() {
 
         createRecyclerView()
 
-        userViewModel.usersData.observe(viewLifecycleOwner, { userData ->
-            userData?.let {
-                binding.progressBar.visibility = View.GONE
-                userAdapter.submitList(it)
-                dataLoaded = true
+        userViewModel.getAllUsers.observe(viewLifecycleOwner, {
+            when (it.status) {
+                Resource.Status.SUCCESS -> {
+                    binding.progressBar.visibility = View.GONE
+                    if (!it.data.isNullOrEmpty()) userAdapter.submitList(it.data)
+                }
+                Resource.Status.ERROR -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                Resource.Status.LOADING -> binding.progressBar.visibility = View.VISIBLE
             }
         })
 
+
         binding.fab.setOnClickListener {
-            userViewModel.delete()
+            //TODO: delete cache
+            //userViewModel.delete()
         }
-        startNetworkCallback()
-        userViewModel.getUsersData()
+
+        //startNetworkCallback()
         return binding.root
     }
 
     override fun onStop() {
         super.onStop()
-        stopNetworkCallback()
+        //stopNetworkCallback()
         Log.v("userViewModel", "stopNetworkCallback")
     }
-
+/*
     private fun startNetworkCallback() {
         val cm: ConnectivityManager =
             activity?.application?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -77,7 +75,7 @@ class UserFragment : Fragment() {
 
                 override fun onAvailable(network: Network) {
                     isNetworkConnected = true
-                    if (!userViewModel.allUsersCached) {
+                    if (!userViewModel.getIsCached()) {
                         userViewModel.getUsersData()
                     }
                 }
@@ -98,6 +96,7 @@ class UserFragment : Fragment() {
         }
 
     }
+ */
 
     private fun createRecyclerView() {
         val recyclerView: RecyclerView = binding.recycleView

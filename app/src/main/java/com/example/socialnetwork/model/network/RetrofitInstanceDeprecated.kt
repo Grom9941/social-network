@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-object RetrofitInstance {
+object RetrofitInstanceDeprecated {
     private const val BASE_DIR =
         "https://firebasestorage.googleapis.com/v0/b/candidates--questionnaire.appspot.com/o/"
 

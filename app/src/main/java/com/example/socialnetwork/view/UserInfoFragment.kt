@@ -1,6 +1,5 @@
 package com.example.socialnetwork.view
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -16,21 +15,20 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.socialnetwork.R
-import com.example.socialnetwork.UserApplication
 import com.example.socialnetwork.databinding.FragmentUserInfoBinding
+import com.example.socialnetwork.model.Resource
 import com.example.socialnetwork.viewmodel.UserViewModel
-import com.example.socialnetwork.viewmodel.ViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
+@AndroidEntryPoint
 class UserInfoFragment : Fragment() {
 
     private lateinit var binding: FragmentUserInfoBinding
     private lateinit var userInfoAdapter: UserInfoAdapter
 
-    private val userViewModel: UserViewModel by activityViewModels {
-        ViewModelFactory((activity?.application as UserApplication).repository)
-    }
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,32 +42,34 @@ class UserInfoFragment : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userViewModel.usersData.observe(viewLifecycleOwner, {
-            it?.let { userCache ->
-                userViewModel.getData().observe(viewLifecycleOwner, { usersListId ->
+        userViewModel.getAllUsers.observe(viewLifecycleOwner, {
+            when (it.status) {
+                Resource.Status.SUCCESS -> {
 
+                    //TODO: change nullable to non-nullable
+                    val usersListId = userViewModel.getData().value
+                    val userCache = it.data
                     var position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
                     position = if (position > 0) position - 1 else position
-                    val userInfo = userCache[usersListId[position]]
+                    val userInfo = usersListId?.get(position)?.let { it1 -> userCache?.get(it1) }
 
-                    val odt = OffsetDateTime.parse(userInfo.registered.replace(" ", ""))
+                    val odt = OffsetDateTime.parse(userInfo?.registered?.replace(" ", ""))
                     val registered = odt.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yy"))
                     binding.registered.text = registered
 
-                    when (userInfo.eyeColor) {
+                    when (userInfo?.eyeColor) {
                         "blue" -> binding.eyeColor.setImageResource(R.drawable.eye_blue)
                         "brown" -> binding.eyeColor.setImageResource(R.drawable.eye_brown)
                         "green" -> binding.eyeColor.setImageResource(R.drawable.eye_green)
                     }
 
                     val listOfFriends = mutableListOf(userInfo)
-                    userInfo.friends.forEach { friend ->
+                    userInfo?.friends?.forEach { friend ->
                         Log.v("userFriends", friend.id.toString())
-                        listOfFriends.add(userCache[friend.id])
+                        listOfFriends.add(userCache?.get(friend.id))
                     }
 
                     Log.v(
@@ -79,7 +79,10 @@ class UserInfoFragment : Fragment() {
 
                     binding.progressBar.visibility = View.GONE
                     userInfoAdapter.submitList(listOfFriends)
-                })
+                }
+                Resource.Status.ERROR -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT)
+                    .show()
+                Resource.Status.LOADING -> binding.progressBar.visibility = View.VISIBLE
             }
         })
     }

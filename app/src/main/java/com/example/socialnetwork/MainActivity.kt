@@ -4,7 +4,9 @@ package com.example.socialnetwork
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.socialnetwork.view.UserFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
