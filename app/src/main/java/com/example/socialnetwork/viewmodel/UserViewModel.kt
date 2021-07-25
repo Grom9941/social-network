@@ -1,16 +1,23 @@
 package com.example.socialnetwork.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.socialnetwork.model.Repository
-import com.example.socialnetwork.model.dataclass.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(repository: Repository) : ViewModel() {
+class UserViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     val getAllUsers = repository.getAllUsers()
+
+    val getUsers = repository.getAllUsers()
+
+    fun deleteAll() = viewModelScope.launch {
+        repository.deleteAll()
+    }
 
     private val sharedData: MutableLiveData<MutableList<Int>> = MutableLiveData()
 
@@ -23,6 +30,4 @@ class UserViewModel @Inject constructor(repository: Repository) : ViewModel() {
     }
 
     fun getData() = sharedData
-
-
 }

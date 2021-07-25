@@ -17,9 +17,6 @@ import com.example.socialnetwork.view.UserInfoFragment.Companion.DIAL_PHONE
 import com.example.socialnetwork.view.UserInfoFragment.Companion.SHOW_LOCATION
 import com.example.socialnetwork.view.UserInfoFragment.Companion.USER_OFFLINE
 
-private const val ITEM_VIEW_TYPE_HEADER = 0
-private const val ITEM_VIEW_TYPE_ITEM = 1
-
 
 class UserInfoAdapter(val onClickListener: MutableLiveData<Map<Int, String>> = MutableLiveData()) :
     ListAdapter<User, RecyclerView.ViewHolder>(UserComparator()) {
@@ -128,5 +125,10 @@ class UserInfoAdapter(val onClickListener: MutableLiveData<Map<Int, String>> = M
         override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
             return oldItem == newItem
         }
+    }
+
+    companion object {
+        private const val ITEM_VIEW_TYPE_HEADER = 0
+        private const val ITEM_VIEW_TYPE_ITEM = 1
     }
 }

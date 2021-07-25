@@ -17,8 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.socialnetwork.R
 import com.example.socialnetwork.databinding.FragmentUserInfoBinding
 import com.example.socialnetwork.model.Resource
+import com.example.socialnetwork.model.dataclass.User
+import com.example.socialnetwork.viewmodel.NetworkStatus
 import com.example.socialnetwork.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.IndexOutOfBoundsException
+import java.lang.NullPointerException
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
@@ -30,6 +34,7 @@ class UserInfoFragment : Fragment() {
 
     private val userViewModel: UserViewModel by activityViewModels()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,24 +43,35 @@ class UserInfoFragment : Fragment() {
         binding = FragmentUserInfoBinding.inflate(inflater, container, false)
         binding.progressBar.visibility = View.VISIBLE
         createRecyclerView()
+
+        context?.let { context ->
+            NetworkStatus(context).observe(viewLifecycleOwner, {
+                userViewModel.getUsers.observe(viewLifecycleOwner, {
+                    handleRequest(it)
+                })
+            })
+        }
+
+        userViewModel.getAllUsers.observe(viewLifecycleOwner, {
+            handleRequest(it)
+        })
+
         return binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun handleRequest(it: Resource<List<User>>) {
+        when (it.status) {
+            Resource.Status.SUCCESS -> {
+                val usersListId = userViewModel.getData().value
+                val userCache = it.data
 
-        userViewModel.getAllUsers.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-
-                    //TODO: change nullable to non-nullable
-                    val usersListId = userViewModel.getData().value
-                    val userCache = it.data
-                    var position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
-                    position = if (position > 0) position - 1 else position
-                    val userInfo = usersListId?.get(position)?.let { it1 -> userCache?.get(it1) }
-
+                var position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
+                position = if (position > 0) position - 1 else position
+                //TODO: fix problem after delete db
+                val userInfo: User?
+                try {
+                    userInfo = usersListId?.get(position)?.let { it1 -> userCache?.get(it1) }
                     val odt = OffsetDateTime.parse(userInfo?.registered?.replace(" ", ""))
                     val registered = odt.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yy"))
                     binding.registered.text = registered
@@ -68,23 +84,26 @@ class UserInfoFragment : Fragment() {
 
                     val listOfFriends = mutableListOf(userInfo)
                     userInfo?.friends?.forEach { friend ->
-                        Log.v("userFriends", friend.id.toString())
                         listOfFriends.add(userCache?.get(friend.id))
                     }
 
-                    Log.v(
-                        USER_INFO_FRAGMENT_LOG_MESSAGE + "cacheRoomRequest",
-                        listOfFriends.toString()
-                    )
+                    Log.i(USER_INFO_FRAGMENT_TAG, listOfFriends.toString())
 
                     binding.progressBar.visibility = View.GONE
                     userInfoAdapter.submitList(listOfFriends)
+                } catch (e: Exception) {
+                    when (e) {
+                        is IndexOutOfBoundsException, is NullPointerException -> Log.e(
+                            USER_INFO_FRAGMENT_TAG,
+                            e.message.toString()
+                        )
+                    }
+
                 }
-                Resource.Status.ERROR -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT)
-                    .show()
-                Resource.Status.LOADING -> binding.progressBar.visibility = View.VISIBLE
             }
-        })
+            Resource.Status.ERROR -> Log.e(USER_INFO_FRAGMENT_TAG, "error status")
+            Resource.Status.LOADING -> Log.i(USER_INFO_FRAGMENT_TAG, "loading status")
+        }
     }
 
     private fun createRecyclerView() {
@@ -92,12 +111,10 @@ class UserInfoFragment : Fragment() {
 
         userInfoAdapter = UserInfoAdapter()
         userInfoAdapter.onClickListener.observe(viewLifecycleOwner, {
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
+            Log.i(USER_INFO_FRAGMENT_TAG, "onClickListener$it")
 
             val dataInt = it.keys.elementAt(0)
             val dataStr = it.values.elementAt(0)
-            Log.v("clickList", dataInt.toString())
-            Log.v("clickList", dataStr)
 
             when (dataInt) {
                 USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT)
@@ -106,7 +123,6 @@ class UserInfoFragment : Fragment() {
                 COMPOSE_EMAIL -> composeEmail(arrayOf(dataStr))
                 SHOW_LOCATION -> showLocation(dataStr)
                 else -> {
-                    Log.v("clickList", "pressed")
                     val position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
                     userViewModel.setData(dataInt, position)
                     transactionToInfo()
@@ -121,19 +137,19 @@ class UserInfoFragment : Fragment() {
     }
 
     private fun transactionToInfo() {
-        val USER_INFO_FRAGMENT_TAG =
-            "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
-        Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "tagFragment", USER_INFO_FRAGMENT_TAG)
+        val userInfoFragmentMessage =
+            "BACK_STACK_" + activity?.supportFragmentManager?.backStackEntryCount
+        Log.i(userInfoFragmentMessage, userInfoFragmentMessage)
 
         activity?.supportFragmentManager
             ?.beginTransaction()
-            ?.replace(R.id.nav_host_fragment_container, UserInfoFragment(), USER_INFO_FRAGMENT_TAG)
-            ?.addToBackStack(USER_INFO_FRAGMENT_TAG)
+            ?.replace(R.id.nav_host_fragment_container, UserInfoFragment(), userInfoFragmentMessage)
+            ?.addToBackStack(userInfoFragmentMessage)
             ?.commit()
     }
 
     private fun dialPhone(phoneNumber: String) {
-        Log.v("SocialNetwork_UserInfoFragment_dialPhone", phoneNumber)
+        Log.i(USER_INFO_FRAGMENT_TAG, "dial phone $phoneNumber")
         val intent = Intent(Intent.ACTION_DIAL).apply {
             data = Uri.parse("tel:$phoneNumber")
         }
@@ -141,7 +157,7 @@ class UserInfoFragment : Fragment() {
     }
 
     private fun composeEmail(addresses: Array<String>) {
-        Log.v("SocialNetwork_UserInfoFragment_composeEmail", addresses.joinToString())
+        Log.i(USER_INFO_FRAGMENT_TAG, "compose email ${addresses.joinToString()}")
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
             putExtra(Intent.EXTRA_EMAIL, addresses)
@@ -150,7 +166,7 @@ class UserInfoFragment : Fragment() {
     }
 
     private fun showLocation(latitudeLongitude: String) {
-        Log.v("SocialNetwork_UserInfoFragment_showLocation", latitudeLongitude)
+        Log.i(USER_INFO_FRAGMENT_TAG, "show location $latitudeLongitude")
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse("geo:$latitudeLongitude")
         }
@@ -164,7 +180,7 @@ class UserInfoFragment : Fragment() {
     }
 
     companion object {
-        private const val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
+        private const val USER_INFO_FRAGMENT_TAG = "com.example.socialnetwork.view_UserInfoFragment"
         const val USER_OFFLINE = -1
         const val DIAL_PHONE = -2
         const val COMPOSE_EMAIL = -3

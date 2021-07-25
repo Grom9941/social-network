@@ -19,8 +19,11 @@ abstract class BaseResource {
     }
 
     private fun <T> error(message: String): Resource<T> {
-        Log.e("remoteDataSource", message)
-        return Resource.error("Network call has failed for a following reason: $message")
+        Log.e(BASE_RESOURCE_TAG, message)
+        return Resource.error("Network isn't available")
     }
 
+    companion object {
+        private const val BASE_RESOURCE_TAG = "com.example.socialnetwork.model_BaseResource"
+    }
 }

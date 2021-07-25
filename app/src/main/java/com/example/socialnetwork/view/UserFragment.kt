@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.socialnetwork.R
 import com.example.socialnetwork.databinding.FragmentUserBinding
 import com.example.socialnetwork.model.Resource
+import com.example.socialnetwork.model.dataclass.User
 import com.example.socialnetwork.view.UserInfoFragment.Companion.USER_OFFLINE
+import com.example.socialnetwork.viewmodel.NetworkStatus
 import com.example.socialnetwork.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,6 +26,7 @@ class UserFragment : Fragment() {
 
     private lateinit var binding: FragmentUserBinding
     private lateinit var userAdapter: UserAdapter
+    private var isDataLoaded = false
 
     private val userViewModel: UserViewModel by activityViewModels()
 
@@ -34,75 +37,54 @@ class UserFragment : Fragment() {
     ): View {
         binding = FragmentUserBinding.inflate(inflater, container, false)
         binding.progressBar.visibility = View.VISIBLE
-
         createRecyclerView()
 
+        context?.let { context ->
+            NetworkStatus(context).observe(viewLifecycleOwner, {
+                userViewModel.getUsers.observe(viewLifecycleOwner, {
+                    handleRequest(it)
+                })
+            })
+        }
+
         userViewModel.getAllUsers.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-                    binding.progressBar.visibility = View.GONE
-                    if (!it.data.isNullOrEmpty()) userAdapter.submitList(it.data)
-                }
-                Resource.Status.ERROR -> Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-                Resource.Status.LOADING -> binding.progressBar.visibility = View.VISIBLE
+            if (!isDataLoaded) {
+                handleRequest(it)
             }
         })
 
-
         binding.fab.setOnClickListener {
-            //TODO: delete cache
-            //userViewModel.delete()
+            isDataLoaded = false
+            userViewModel.deleteAll()
         }
 
-        //startNetworkCallback()
         return binding.root
     }
 
-    override fun onStop() {
-        super.onStop()
-        //stopNetworkCallback()
-        Log.v("userViewModel", "stopNetworkCallback")
-    }
-/*
-    private fun startNetworkCallback() {
-        val cm: ConnectivityManager =
-            activity?.application?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val builder: NetworkRequest.Builder = NetworkRequest.Builder()
-
-        cm.registerNetworkCallback(
-            builder.build(),
-            object : ConnectivityManager.NetworkCallback() {
-
-                override fun onAvailable(network: Network) {
-                    isNetworkConnected = true
-                    if (!userViewModel.getIsCached()) {
-                        userViewModel.getUsersData()
-                    }
-                }
-
-                override fun onLost(network: Network) {
-                    isNetworkConnected = false
-                }
-            })
+    override fun onDestroyView() {
+        super.onDestroyView()
+        isDataLoaded = false
     }
 
-    private fun stopNetworkCallback() {
-        try {
-            val cm: ConnectivityManager =
-                activity?.application?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            cm.unregisterNetworkCallback(ConnectivityManager.NetworkCallback())
-        } catch (exception: IllegalArgumentException) {
-            Log.i("NetworkCallback", "already unregistered")
+    private fun handleRequest(it: Resource<List<User>>) {
+        when (it.status) {
+            Resource.Status.SUCCESS -> {
+                if (!it.data.isNullOrEmpty()) {
+                    binding.progressBar.visibility = View.GONE
+                    isDataLoaded = true
+                    userAdapter.submitList(it.data)
+                }
+            }
+            Resource.Status.ERROR -> Log.e(USER_INFO_FRAGMENT_TAG, "error status")
+            Resource.Status.LOADING -> Log.i(USER_INFO_FRAGMENT_TAG, "loading status")
         }
-
     }
- */
 
     private fun createRecyclerView() {
         val recyclerView: RecyclerView = binding.recycleView
         userAdapter = UserAdapter()
         userAdapter.onClickListener.observe(viewLifecycleOwner, {
-            Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "onClickListener", it.toString())
+            Log.i(USER_INFO_FRAGMENT_TAG, "click listener $it")
             when (it) {
                 USER_OFFLINE -> Toast.makeText(context, "User is offline", Toast.LENGTH_SHORT)
                     .show()
@@ -122,18 +104,18 @@ class UserFragment : Fragment() {
     }
 
     private fun transactionToInfo() {
-        val USER_INFO_FRAGMENT_TAG =
-            "BACK_STACK_INFO_TAG_" + activity?.supportFragmentManager?.backStackEntryCount
-        Log.v(USER_INFO_FRAGMENT_LOG_MESSAGE + "tagFragment", USER_INFO_FRAGMENT_TAG)
+        val userInfoFragmentMessage =
+            "BACK_STACK_" + activity?.supportFragmentManager?.backStackEntryCount
+        Log.i(USER_INFO_FRAGMENT_TAG, userInfoFragmentMessage)
 
         activity?.supportFragmentManager
             ?.beginTransaction()
-            ?.replace(R.id.nav_host_fragment_container, UserInfoFragment(), USER_INFO_FRAGMENT_TAG)
-            ?.addToBackStack(USER_INFO_FRAGMENT_TAG)
+            ?.replace(R.id.nav_host_fragment_container, UserInfoFragment(), userInfoFragmentMessage)
+            ?.addToBackStack(userInfoFragmentMessage)
             ?.commit()
     }
 
     companion object {
-        private const val USER_INFO_FRAGMENT_LOG_MESSAGE = "SocialNetwork_UserFragment_"
+        private const val USER_INFO_FRAGMENT_TAG = "com.example.socialnetwork.view_UserFragment"
     }
 }
