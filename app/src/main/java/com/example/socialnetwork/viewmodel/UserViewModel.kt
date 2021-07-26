@@ -11,12 +11,13 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
-    val getAllUsers = repository.getAllUsers()
+    var getAllUsers = repository.getAllUsers()
 
     val getUsers = repository.getAllUsers()
 
     fun deleteAll() = viewModelScope.launch {
         repository.deleteAll()
+        getAllUsers = repository.getAllUsers()
     }
 
     private val sharedData: MutableLiveData<MutableList<Int>> = MutableLiveData()

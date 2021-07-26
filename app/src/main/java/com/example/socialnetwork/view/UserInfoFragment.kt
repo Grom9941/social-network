@@ -34,7 +34,6 @@ class UserInfoFragment : Fragment() {
 
     private val userViewModel: UserViewModel by activityViewModels()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,7 +58,6 @@ class UserInfoFragment : Fragment() {
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleRequest(it: Resource<List<User>>) {
         when (it.status) {
             Resource.Status.SUCCESS -> {
@@ -68,11 +66,14 @@ class UserInfoFragment : Fragment() {
 
                 var position = activity?.supportFragmentManager?.backStackEntryCount ?: 0
                 position = if (position > 0) position - 1 else position
-                //TODO: fix problem after delete db
                 val userInfo: User?
                 try {
                     userInfo = usersListId?.get(position)?.let { it1 -> userCache?.get(it1) }
-                    val odt = OffsetDateTime.parse(userInfo?.registered?.replace(" ", ""))
+                    val odt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        OffsetDateTime.parse(userInfo?.registered?.replace(" ", ""))
+                    } else {
+                        TODO("VERSION.SDK_INT < O")
+                    }
                     val registered = odt.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yy"))
                     binding.registered.text = registered
 

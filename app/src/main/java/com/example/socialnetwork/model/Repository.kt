@@ -45,7 +45,7 @@ class Repository @Inject constructor(
 
             } else if (responseStatus.status == Resource.Status.ERROR) {
                 emit(Resource.error(responseStatus.message!!))
-                emitSource(source)
+                emitSource(source   )
             }
         }
 
