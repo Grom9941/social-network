@@ -41,9 +41,11 @@ class UserFragment : Fragment() {
 
         context?.let { context ->
             NetworkStatus(context).observe(viewLifecycleOwner, {
-                userViewModel.getUsers.observe(viewLifecycleOwner, {
-                    handleRequest(it)
-                })
+                if (!isDataLoaded) {
+                    userViewModel.getUsers.observe(viewLifecycleOwner, {
+                        handleRequest(it)
+                    })
+                }
             })
         }
 

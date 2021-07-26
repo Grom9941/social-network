@@ -14,11 +14,14 @@ class UserViewModel @Inject constructor(private val repository: Repository) : Vi
     var getAllUsers = repository.getAllUsers()
 
     val getUsers = repository.getAllUsers()
+    val getUsers1 = repository.getAllUsers()
 
     fun deleteAll() = viewModelScope.launch {
         repository.deleteAll()
         getAllUsers = repository.getAllUsers()
     }
+
+    fun update() = viewModelScope.launch { getAllUsers = repository.getAllUsers() }
 
     private val sharedData: MutableLiveData<MutableList<Int>> = MutableLiveData()
 
