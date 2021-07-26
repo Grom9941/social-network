@@ -1,4 +1,4 @@
-# Music Service App
+# App
 
 MVVM+Hilt+Room+Retrofit
 
