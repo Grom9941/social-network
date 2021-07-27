@@ -69,26 +69,19 @@ class UserInfoFragment : Fragment() {
                     userInfo = usersListId?.get(position)?.let { it1 -> userCache?.get(it1) }
 
                     var registered = ""
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val odt = OffsetDateTime.parse(userInfo?.registered?.replace(" ", ""))
-                        registered = odt.format(DateTimeFormatter.ofPattern("HH:mm dd.MM.yy"))
-                    } else {
-                        val fromUser =
-                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-                        val myFormat = SimpleDateFormat("HH:mm dd.MM.yy", Locale.getDefault())
+                    val fromUser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z", Locale.getDefault())
+                    val myFormat = SimpleDateFormat("HH:mm dd.MM.yy", Locale.getDefault())
 
-                        try {
-                            registered = myFormat.format(
-                                fromUser.parse(userInfo?.registered?.replace(" ", "")!!)!!
-                            )
-                        } catch (e: Exception) {
-                            when (e) {
-                                is ParseException, is NullPointerException ->
-                                    Log.e(USER_INFO_FRAGMENT_TAG, e.printStackTrace().toString())
-                                else -> Log.e(USER_INFO_FRAGMENT_TAG, "some error")
-                            }
+                    try {
+                        registered = myFormat.format(fromUser.parse(userInfo?.registered!!)!!)
+                    } catch (e: Exception) {
+                        when (e) {
+                            is ParseException, is NullPointerException ->
+                                Log.e(USER_INFO_FRAGMENT_TAG, e.printStackTrace().toString())
+                            else -> Log.e(USER_INFO_FRAGMENT_TAG, "some error")
                         }
                     }
+
 
                     binding.registered.text = registered
 
